@@ -1,71 +1,75 @@
-.const total		= $fb	// 16bit, $0000
-.const input_ptr1	= $39	// pointer 1 to input data table
-.const input_ptr2	= $3b	// pointer 1 to input data table
-.const input_ptr3	= $3d	// pointer 1 to input data table
-.const s1_length	= $2
-.const s2_length	= $3
-.const s3_length	= $4
+.const total		= $fb			// 16bit, $0000
+.const input_ptr	= $39			// 16bit input table pointer
+.const buffer1		= $4000			// Buffer addresses
+.const buffer2		= $4100
+.const buffer3		= $4200
 
-.const LF			= $0a	// ASCII code for Line Feed
+.const LF			= $0a			// ASCII code for Line Feed
 .const priorities	= priority_table - 'A'
 
 * = $0801 "Basic Header"
 				.word start, input; .byte $9e; .text "2061"; .byte 0,0,0
 
-* = * "Calculate total score according to the strategy plan"
-start:
+* = * "Sum of priorities of badges that exist in sets of three rucksacks"
+start:			jsr line_to_buffer	// Read three lines to buffers
+				sty s1_size
+				inc buf_ptr+1
+				jsr line_to_buffer
+				sty s2_size
+				inc buf_ptr+1
+				jsr line_to_buffer
+				sty s3_size
+				dec buf_ptr+1
+				dec buf_ptr+1
+				
+				ldy s1_size:#$ff	// Get char from buffer 1 and check if exists in 2 and 3
+	next_char:	dey
+				lda buffer1,y
 
-				ldy #0				// Count chars on line
-			!:	lda (input_ptr1),y
-				beq done
-				iny
-				cmp #LF
-				bne !-
-				
-				tya					// Add string length to total # of bytes read
-				clc
-				adc bytes_read
-				sta bytes_read
-
-				dey
-				sty s1_length
-				
-				
-				sty read_index		// Save index to the end of 2nd rucksack
-				tya
-				lsr
-				sta loop_count		// Save index to the end of 1st rucksack
-
-	next_char:	dec read_index
-				ldy read_index:#$ff	// Selfmodded # of chars
-				lda (input_ptr1),y	// Read char from 2nd rucksack
-				
-				ldy loop_count:#$ff	// Compare it to chars in 1st rucksack
-			!:	dey
-				bmi next_char		// No match in bottom half, check next char
-				cmp (input_ptr1),y
+				ldx s2_size:#$ff
+			!:	dex
+				bmi next_char		// No match in buffer 2, move on to the next char
+				cmp buffer2,x
 				bne !-
 
-				tay					// Match found, use it as an index to priorities table
-				lda priorities, y
+				ldx s3_size:#$ff
+			!:	dex
+				bmi next_char		// No match in buffer 3, move on to the next char
+				cmp buffer3,x
+				bne !-
+
+match:			tay					// Match found, use it as an index to priorities table
+				lda priorities, y	// Read priority for given char
 				clc					// Add priority to the total
 				adc total
 				sta total
-				bcc !+
-				inc total+1
-
-			!:	lda bytes_read:#$ff	// Line done, update input table pointer
-				clc
-				adc input_ptr1
-				sta input_ptr1
 				bcc start
-				inc input_ptr1+1
+				inc total+1
 				bcs start
+
+
+line_to_buffer:	ldy #0				// Count chars on a line
+			!:	lda (input_ptr),y
+				beq done			// End of input data, print the result on screen
+				sta buf_ptr:buffer1,y	// selfmodded buffer address
+				iny
+				cmp #LF				// Read until reaching end of line
+				bne !-
 				
+				tya					// Move input pointer to beginning of next line
+				clc
+				adc input_ptr
+				sta input_ptr
+				bcc !+
+				inc input_ptr+1
+			!:	dey					// Y--, now holds # of chars in line
+				rts
+
+
 done:			ldx total			// print total as decimal number
 				lda total+1
 				jsr $bdcd			// EXPECTED: Part1 = 7817, Part2 = ???
-				rts
+				bvc *
 
 // Lowercase item types a through z have priorities 1 through 26.
 // Uppercase item types A through Z have priorities 27 through 52.
@@ -74,10 +78,8 @@ priority_table:	.fill 26, 27+i		// A-Z ($41-$5a) = priorities 27-52
 				.fill 26, 1+i		// a-z ($61-$7a) = priorities 1-26
 				
 * = * "Input Data"
-input:			.import binary "input/day03_input.txt"
-				// .import binary "input/day03_input_test.txt"	// expected: 157
-				// In the above example, the priority of the item type that appears in both
-				// compartments of each rucksack is 16 (p), 38 (L), 42 (P), 22 (v), 20 (t), and
-				// 19 (s); the sum of these is 157.
+input:
+				.import binary "input/day03_input.txt"
+				// .import binary "input/day03_input_test.txt"	// expected: part1 = 157, part2 = 70
 				.byte 0 // End of table
 * = * "End"

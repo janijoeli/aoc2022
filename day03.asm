@@ -1,13 +1,13 @@
-.const total		= $fb	// 16bit, $0000
-.const input_ptr	= $39	// pointer to input data table
+.const total		= $fb			// 16bit, $0000
+.const input_ptr	= $39			// pointer to input data table
 
-.const LF			= $0a	// ASCII code for Line Feed
-.const priorities	= priority_table - 'A'
+.const LF			= $0a			// ASCII code for Line Feed
+.const priorities	= priority_table - 'A'	// priority table incl. offset
 
 * = $0801 "Basic Header"
 				.word start, input; .byte $9e; .text "2061"; .byte 0,0,0
 
-* = * "Calculate total score according to the strategy plan"
+* = * "Sum of priorities of items that exist in both compartments of rucksacks"
 start:			ldy #0				// Count chars on line
 			!:	lda (input_ptr),y
 				beq done
