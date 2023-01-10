@@ -30,6 +30,8 @@ Insallations and configurations (see each application's installation guide for d
 - Install VICE (and optionally Retro Debugger)
 - Install VS Code and Paul's KickAss extension
 - In extension's settings, tell it where your KickAss.jar and java (e.g. /usr/bin/java), emulator (e.g. x64sc.app or exe) and debugger (e.g. C64 Debugger.app or exe) runtimes are
+
+Running the solutions:
 - Open any .asm file from this repo and press F6 to compile and run it in Vice, or Shift-F6 to compile and run in the debugger. That's it!
 
 At bare minimum, you'll need Java, KickAss.jar and an emulator to run the compiled .prg files on.
