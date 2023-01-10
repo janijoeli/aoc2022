@@ -47,7 +47,6 @@ match:			tay					// Match found, use it as an index to priorities table
 				inc total+1
 				bcs start
 
-
 line_to_buffer:	ldy #0				// Count chars on a line
 			!:	lda (input_ptr),y
 				beq done			// End of input data, print the result on screen
@@ -65,10 +64,9 @@ line_to_buffer:	ldy #0				// Count chars on a line
 			!:	dey					// Y--, now holds # of chars in line
 				rts
 
-
 done:			ldx total			// print total as decimal number
 				lda total+1
-				jsr $bdcd			// EXPECTED: Part1 = 7817, Part2 = ???
+				jsr $bdcd
 				bvc *
 
 // Lowercase item types a through z have priorities 1 through 26.
@@ -80,6 +78,6 @@ priority_table:	.fill 26, 27+i		// A-Z ($41-$5a) = priorities 27-52
 * = * "Input Data"
 input:
 				.import binary "input/day03_input.txt"
-				// .import binary "input/day03_input_test.txt"	// expected: part1 = 157, part2 = 70
+				// .import binary "input/day03_input_test.txt"	// Expected: 70
 				.byte 0 // End of table
 * = * "End"

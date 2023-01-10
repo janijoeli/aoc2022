@@ -68,7 +68,7 @@ readline:		lda (input_ptr),y
 
 done:			ldx total			// print total as decimal number
 				lda total+1
-				jsr $bdcd			// EXPECTED: Part1 = 11841, Part2 = 13022
+				jsr $bdcd
 				rts
 
 * = * "Input Data"

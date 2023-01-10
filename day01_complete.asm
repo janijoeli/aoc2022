@@ -93,8 +93,6 @@ cmp_sums:		ldy #0
 				stx sum2_ptr
 				bne cmp_sums
 
-// Calculate and display total sum of top three sums
-// EXPECTED: 66810 + 68143 + 68467 = 203420
 calc_result:	ldy #5
 				clc
 			!:	lda (sum2_ptr),y

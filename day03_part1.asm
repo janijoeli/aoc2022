@@ -50,7 +50,7 @@ start:			ldy #0				// Count chars on line
 				
 done:			ldx total			// print total as decimal number
 				lda total+1
-				jsr $bdcd			// EXPECTED: Part1 = 7817, Part2 = ???
+				jsr $bdcd
 				rts
 
 // Lowercase item types a through z have priorities 1 through 26.
@@ -61,9 +61,6 @@ priority_table:	.fill 26, 27+i		// A-Z ($41-$5a) = priorities 27-52
 				
 * = * "Input Data"
 input:			.import binary "input/day03_input.txt"
-				// .import binary "input/day03_input_test.txt"	// expected: 157
-				// In the above example, the priority of the item type that appears in both
-				// compartments of each rucksack is 16 (p), 38 (L), 42 (P), 22 (v), 20 (t), and
-				// 19 (s); the sum of these is 157.
+				// .import binary "input/day03_input_test.txt"	// Expected: 157
 				.byte 0 // End of table
 * = * "End"

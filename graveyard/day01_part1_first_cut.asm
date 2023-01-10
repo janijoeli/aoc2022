@@ -113,7 +113,6 @@ show_result:	lda #$30		// init the result on screen to 00000
 				bpl loop1
 
 		end:	rts
-				// EXPECTED: 68467
 				
 calculate:		clc
 				ldy #4

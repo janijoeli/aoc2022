@@ -67,7 +67,7 @@ readline:		lda (input_ptr),y
 
 done:			ldx total			// print total as decimal number
 				lda total+1
-				jsr $bdcd			// EXPECTED: 11841
+				jsr $bdcd
 				// 122125 cycles @ 985248 cycles per second = ~124ms
 				// 115761 with screen turned off = actual cycles
 				// cli				// enable interrupts
