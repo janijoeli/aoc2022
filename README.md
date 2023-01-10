@@ -3,6 +3,8 @@ Advent of Code 2022 solutions in Commodore 64 Kick Assembler
 
 My attempts to complete as many AoC 2022 challenges as possible in 6502 assembler, targeted for stock Commodore 64.
 
+https://adventofcode.com/2022/about
+
 Computer specs:
 - CPU: MOS 6510 (fully 6502 compatible) @ 0.985 MHz (PAL version). Fully 8-bit, including all (three!) CPU registers. The only 16-bit thing is the width of memory bus.
 - RAM: 64KB
