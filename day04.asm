@@ -1,3 +1,9 @@
+/**
+	If range starts are equal, one of them always fits to the other.
+	If range1_start < range2_start, range1_end must be >= range2_end for 2 to fit 1.
+	If range1_start > range2_start, range2_end must be >= range1_end for 1 to fit 2.
+*/
+
 .const total		= $fb			// 16bit, $0000
 .const input_ptr	= $39			// pointer to input data table
 .const ones			= $2			// temporary holder for a ones digit
@@ -12,7 +18,7 @@
 * = $0801 "Basic Header"
 				.word start, input; .byte $9e; .text "2061"; .byte 0,0,0
 
-* = * "Sum of priorities of items that exist in both compartments of rucksacks"
+* = * "Finding Fully or Partially Overlapping Ranges"
 start:			ldy #0				// Read two ranges from a line
 				jsr read_number
 				stx range1_start
@@ -27,37 +33,25 @@ start:			ldy #0				// Read two ranges from a line
 				clc
 				adc input_ptr
 				sta input_ptr
-				bcc !+
+				bcc compare_ranges
 				inc input_ptr+1
 				
-				/**
-					If range ends are equal, one of them always fits to the other.
-					If range starts are equal, one of them always fits to the other.
-					If range1_start < range2_start, range1_end must be >= range2_end for 2 to fit 1.
-					Otherwise, range2_end must be >= range1_end for 1 to fit 2.
+compare_ranges:	lda range1_start
+				cmp range2_start
+				beq fits				// Range starts are equal, one fits another
+				bcc is_r1_longer		// r1 starts earlier, does it also end later?
+				lda range2_end			// r1 starts later, does r2 end later?
+				cmp range1_end
+				bcs fits				// r2 ends at or after r1 end, fits
+				bcc start				// r2 ends before r1, no fit
+is_r1_longer:	lda range1_end
+				cmp range2_end
+				bcc start				// r1 ends before r2, no fit
 
-					BCC = A is less than number
-					BCS = A >= number
-				 */
-				
-			!:
-					lda range1_start
-					cmp range2_start
-					beq fits				// Range starts are equal
-					bcc is_r1_end_bigger
-					// r1 start > r2 start. Is r2 end larger or equal than r1 end? 
-					lda range2_end
-					cmp range1_end
-					bcs fits				// r2 end is larger or equal than r1 end
-					bcc start				// r2 end is smaller than r1 end, no fit
-is_r1_end_bigger:	lda range1_end
-					cmp range2_end
-					bcc start				// r1 end is smaller than r2 end, no fit
-
-			fits:	inc total
-					bne start
-					inc total+1
-					bne start
+		fits:	inc total
+				bne start
+				inc total+1
+				bne start
 
 
 				
@@ -87,8 +81,7 @@ finish:			ldx total			// print total as decimal number
 				jmp *
 				
 * = * "Input Data"
-input:
-				.import binary "input/day04_input.txt"
+input:			.import binary "input/day04_input.txt"
 				// .import binary "input/day04_input_test.txt"	// Expected: 2
 				// .import binary "input/day04_input_test_better.txt"	// Expected: 5
 				.byte 0 // End of table
