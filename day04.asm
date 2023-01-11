@@ -36,6 +36,7 @@ start:			ldy #0				// Read two ranges from a line
 				bcc compare_ranges
 				inc input_ptr+1
 				
+				// Part1 - testing for fully overlapping ranges
 compare_ranges:	lda range1_start
 				cmp range2_start
 				beq fits				// Range starts are equal, one fits another
